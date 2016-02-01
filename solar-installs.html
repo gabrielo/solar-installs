@@ -174,7 +174,7 @@
 
             var attributeLoc = gl.getAttribLocation(coralBleaching.program, 'worldCoord');
         	gl.enableVertexAttribArray(attributeLoc);
-        	gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 0, 0);
+        	gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 12, 0);
 
 			var sizeLoc = gl.getUniformLocation(coralBleaching.program, 'uSize');
         	gl.uniform1f(sizeLoc, pointSize);
