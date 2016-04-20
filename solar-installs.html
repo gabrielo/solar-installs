@@ -1,30 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>Solar Installs</title>
-	<style>
-  		html, body, #map-div {
-    	  margin: 0;
-    	  padding: 0;
-    	  height: 100%;
-  		}
-	</style>
-	<script src="http://maps.googleapis.com/maps/api/js?sensor=false&v=3.20"></script>
-	<script type="text/javascript" src="CanvasLayer.js"></script>
-	<script type="text/javascript" src="Glb.js"></script>
-	<script id="vertex-shader" type="x-shader/x-vertex">
+  <head>
+  	<title>Solar Installs</title>
+  	<style>
+    		html, body, #map-div {
+      	  margin: 0;
+      	  padding: 0;
+      	  height: 100%;
+    		}
+  	</style>
+  	<script src="http://maps.googleapis.com/maps/api/js?sensor=false&v=3.20"></script>
+  	<script type="text/javascript" src="CanvasLayer.js"></script>
+  	<script type="text/javascript" src="Glb.js"></script>
+  	<script id="vertex-shader" type="x-shader/x-vertex">
       attribute vec4 worldCoord;
 
       uniform mat4 mapMatrix;
       uniform float uSize;
 
-
       void main() {
         gl_Position = mapMatrix * worldCoord;
         gl_PointSize = uSize;
       }	
-	</script>
-	<script id="fragment-shader" type="x-shader/x-vertex">
+  	</script>
+  	<script id="fragment-shader" type="x-shader/x-vertex">
       precision mediump float;
 
       void main() {
@@ -33,164 +32,155 @@
         dist = max(0., dist);
         gl_FragColor = vec4(.08, .86, .34, 1.) * dist;
       }	
-	</script>
+  	</script>
 
-	<script type="text/javascript">
-	    var map;
-	    var canvasLayer;
-	    var gl;
+  	<script type="text/javascript">
+      var map;
+      var canvasLayer;
+      var gl;
 
-		var coralBleaching = {
-			url: "solar-installs.bin"
-		};
+  		var coralBleaching = {
+  			url: "solar-installs.bin"
+  		};
 
-	    var pixelsToWebGLMatrix = new Float32Array(16);
-	    var mapMatrix = new Float32Array(16);
+      var pixelsToWebGLMatrix = new Float32Array(16);
+      var mapMatrix = new Float32Array(16);
 
-	    var countryPointSizePixels = 5;
+      var countryPointSizePixels = 5;
     	var blockPointSizePixels = 20;
     	var pointSize;
 
 	    function init() {
-	      	map = initMap();
-	      	canvasLayer = initCanvasLayer(map, update, resize);
-	      	gl = canvasLayer.canvas.getContext('experimental-webgl');
-	      	gl.enable(gl.BLEND);
-            gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
-	      	coralBleaching.glb = new Glb(gl);
-		  	coralBleaching.program = coralBleaching.glb.programFromSources(document.getElementById('vertex-shader').text,
-      			document.getElementById('fragment-shader').text);
-		  	load(coralBleaching);
-
+        map = initMap();
+        canvasLayer = initCanvasLayer(map, update, resize);
+        gl = canvasLayer.canvas.getContext('experimental-webgl');
+        gl.enable(gl.BLEND);
+        gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
+        coralBleaching.glb = new Glb(gl);
+        coralBleaching.program = coralBleaching.glb.programFromSources(document.getElementById('vertex-shader').text,
+        document.getElementById('fragment-shader').text);
+        load(coralBleaching);
 	    }
-	    document.addEventListener('DOMContentLoaded', init, false);
-        window.addEventListener('resize', function () {  google.maps.event.trigger(map, 'resize') }, false);
+
+      document.addEventListener('DOMContentLoaded', init, false);
+      window.addEventListener('resize', function () {  google.maps.event.trigger(map, 'resize') }, false);
 
 	    function initMap() {
-	      	// initialize the map
-    	  	var mapOptions = {
-        		zoom: 2,
-        		center: new google.maps.LatLng(0.0, -20.0)
-	      	};
-      		var mapDiv = document.getElementById('map-div');
-      		return new google.maps.Map(mapDiv, mapOptions);
-      	}
+      	// initialize the map
+  	  	var mapOptions = {
+      		zoom: 2,
+      		center: new google.maps.LatLng(0.0, -20.0)
+      	};
+    		var mapDiv = document.getElementById('map-div');
+    		return new google.maps.Map(mapDiv, mapOptions);
+    	}
 
-      	function initCanvasLayer(map, update, resize) {
-      		var canvasLayerOptions = {
-        		map: map,
-        		resizeHandler: resize,
-        		animate: false,
-        		updateHandler: update
-      		};
-      		return new CanvasLayer(canvasLayerOptions);
-      	}
+    	function initCanvasLayer(map, update, resize) {
+    		var canvasLayerOptions = {
+      		map: map,
+      		resizeHandler: resize,
+      		animate: false,
+      		updateHandler: update
+    		};
+    		return new CanvasLayer(canvasLayerOptions);
+    	}
 
-	    function load(obj) {
-	      var xhr = new XMLHttpRequest();
-	      xhr.open('GET', obj.url);
-	      xhr.responseType = 'arraybuffer';
-	      xhr.onload = function() {
-	      	var float32Array = new Float32Array(this.response);
-			obj.buffer = float32Array;
-			setData(obj);
-	      }
-	      xhr.send();
-	    }
+      function load(obj) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', obj.url);
+        xhr.responseType = 'arraybuffer';
+        xhr.onload = function() {
+          var float32Array = new Float32Array(this.response);
+          obj.buffer = float32Array;
+          setData(obj);
+        }
+        xhr.send();
+      }
 
-		function setData(obj) {
-      		obj.pointCount = obj.buffer.length / 3; 
-		    obj.data = obj.buffer;
-      		obj.arrayBuffer = gl.createBuffer();
-      		gl.bindBuffer(gl.ARRAY_BUFFER, obj.arrayBuffer);
-      		gl.bufferData(gl.ARRAY_BUFFER, obj.data, gl.STATIC_DRAW);
+  		function setData(obj) {
+        obj.pointCount = obj.buffer.length / 3; 
+        obj.data = obj.buffer;
+        obj.arrayBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, obj.arrayBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, obj.data, gl.STATIC_DRAW);
 
-			var attributeLoc = gl.getAttribLocation(obj.program, 'worldCoord');
-        	gl.enableVertexAttribArray(attributeLoc);
-        	gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 12, 0);
+        var attributeLoc = gl.getAttribLocation(obj.program, 'worldCoord');
+        gl.enableVertexAttribArray(attributeLoc);
+        gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 12, 0);
 
-		    obj.ready = true;
-		}
+        obj.ready = true;
+        update();
+  		}
 
 	    function resize() {
-	    	console.log('resizeHandler');
-		    var w = gl.canvas.width;
-	        var h = gl.canvas.height;
-   	        gl.viewport(0, 0, w, h);
+        console.log('resizeHandler');
+        var w = gl.canvas.width;
+        var h = gl.canvas.height;
+        gl.viewport(0, 0, w, h);
 
-	        // matrix which maps pixel coordinates to WebGL coordinates
-	        pixelsToWebGLMatrix.set([2/w, 0,   0, 0,
-	          0,  -2/h, 0, 0,
-	          0,   0,   0, 0,
-	         -1,   1,   0, 1]);
+        // matrix which maps pixel coordinates to WebGL coordinates
+        pixelsToWebGLMatrix.set([2/w, 0,   0, 0,
+          0,  -2/h, 0, 0,
+          0,   0,   0, 0,
+         -1,   1,   0, 1]);
 	    }
 
 	    function update() {
-			if (coralBleaching.ready) {
-
-		    	gl.clear(gl.COLOR_BUFFER_BIT);
-
-		        var mapProjection = map.getProjection();
-
-		        // copy pixel->webgl matrix
-		        mapMatrix.set(pixelsToWebGLMatrix);
-
-		        // Scale to current zoom (worldCoords * 2^zoom)
-		        var scale = canvasLayer.getMapScale();
-		        scaleMatrix(mapMatrix, scale, scale);
-
-		        var translation = canvasLayer.getMapTranslation();
-		        translateMatrix(mapMatrix, translation.x, translation.y);
-		        draw(mapMatrix);
-		    }	    	
+  			if (coralBleaching.ready) {
+          gl.clear(gl.COLOR_BUFFER_BIT);
+          var mapProjection = map.getProjection();
+          mapMatrix.set(pixelsToWebGLMatrix);
+          var scale = canvasLayer.getMapScale();
+          scaleMatrix(mapMatrix, scale, scale);
+          var translation = canvasLayer.getMapTranslation();
+          translateMatrix(mapMatrix, translation.x, translation.y);
+          draw(mapMatrix);
+  		  }	    	
 	    }
 
-		function scaleMatrix(matrix, scaleX, scaleY) {
-			matrix[0] *= scaleX;
-			matrix[1] *= scaleX;
-			matrix[2] *= scaleX;
-			matrix[3] *= scaleX;
+  		function scaleMatrix(matrix, scaleX, scaleY) {
+  			matrix[0] *= scaleX;
+  			matrix[1] *= scaleX;
+  			matrix[2] *= scaleX;
+  			matrix[3] *= scaleX;
 
-			matrix[4] *= scaleY;
-			matrix[5] *= scaleY;
-			matrix[6] *= scaleY;
-			matrix[7] *= scaleY;
-		}
+  			matrix[4] *= scaleY;
+  			matrix[5] *= scaleY;
+  			matrix[6] *= scaleY;
+  			matrix[7] *= scaleY;
+  		}
 
-		function translateMatrix(matrix, tx, ty) {
-			matrix[12] += matrix[0]*tx + matrix[4]*ty;
-			matrix[13] += matrix[1]*tx + matrix[5]*ty;
-			matrix[14] += matrix[2]*tx + matrix[6]*ty;
-			matrix[15] += matrix[3]*tx + matrix[7]*ty;
-		}
+  		function translateMatrix(matrix, tx, ty) {
+  			matrix[12] += matrix[0]*tx + matrix[4]*ty;
+  			matrix[13] += matrix[1]*tx + matrix[5]*ty;
+  			matrix[14] += matrix[2]*tx + matrix[6]*ty;
+  			matrix[15] += matrix[3]*tx + matrix[7]*ty;
+  		}
 
-	    function draw(transform) {
-        	pointSize = countryPointSizePixels * Math.pow(blockPointSizePixels / countryPointSizePixels, (map.zoom - 1) / (21 - 1));
+      function draw(transform) {
+        pointSize = countryPointSizePixels * Math.pow(blockPointSizePixels / countryPointSizePixels, (map.zoom - 1) / (21 - 1));
+        gl.useProgram(coralBleaching.program);
+        gl.bindBuffer(gl.ARRAY_BUFFER, coralBleaching.arrayBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, coralBleaching.data, gl.STATIC_DRAW);
 
-	    	gl.useProgram(coralBleaching.program);
+        var attributeLoc = gl.getAttribLocation(coralBleaching.program, 'worldCoord');
+        gl.enableVertexAttribArray(attributeLoc);
+        gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 12, 0);
 
-	        gl.bindBuffer(gl.ARRAY_BUFFER, coralBleaching.arrayBuffer);
-      		gl.bufferData(gl.ARRAY_BUFFER, coralBleaching.data, gl.STATIC_DRAW);
+        var sizeLoc = gl.getUniformLocation(coralBleaching.program, 'uSize');
+        gl.uniform1f(sizeLoc, pointSize);
 
-            var attributeLoc = gl.getAttribLocation(coralBleaching.program, 'worldCoord');
-        	gl.enableVertexAttribArray(attributeLoc);
-        	gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 12, 0);
+        var matrixLoc = gl.getUniformLocation(coralBleaching.program, 'mapMatrix');
+        gl.uniformMatrix4fv(matrixLoc, false, transform);
 
-			var sizeLoc = gl.getUniformLocation(coralBleaching.program, 'uSize');
-        	gl.uniform1f(sizeLoc, pointSize);
+        gl.bindBuffer(gl.ARRAY_BUFFER, coralBleaching.arrayBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, coralBleaching.data, gl.STATIC_DRAW);
+        gl.drawArrays(gl.POINTS, 0, coralBleaching.pointCount);
 
-        	var matrixLoc = gl.getUniformLocation(coralBleaching.program, 'mapMatrix');
-		    gl.uniformMatrix4fv(matrixLoc, false, transform);
-
-	        gl.bindBuffer(gl.ARRAY_BUFFER, coralBleaching.arrayBuffer);
-      		gl.bufferData(gl.ARRAY_BUFFER, coralBleaching.data, gl.STATIC_DRAW);
-
-          	gl.drawArrays(gl.POINTS, 0, coralBleaching.pointCount);
-
-	    }
-	</script>
-</head>
-<body>
+      }
+  	</script>
+  </head>
+  <body>
     <div id="map-div"></div>
-</body>
+  </body>
 </html>
