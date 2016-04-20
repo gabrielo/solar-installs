@@ -39,7 +39,7 @@
       var canvasLayer;
       var gl;
 
-  		var coralBleaching = {
+  		var solarInstalls = {
   			url: "solar-installs.bin"
   		};
 
@@ -56,10 +56,10 @@
         gl = canvasLayer.canvas.getContext('experimental-webgl');
         gl.enable(gl.BLEND);
         gl.blendFunc( gl.SRC_ALPHA, gl.ONE );
-        coralBleaching.glb = new Glb(gl);
-        coralBleaching.program = coralBleaching.glb.programFromSources(document.getElementById('vertex-shader').text,
+        solarInstalls.glb = new Glb(gl);
+        solarInstalls.program = solarInstalls.glb.programFromSources(document.getElementById('vertex-shader').text,
         document.getElementById('fragment-shader').text);
-        load(coralBleaching);
+        load(solarInstalls);
 	    }
 
       document.addEventListener('DOMContentLoaded', init, false);
@@ -126,7 +126,7 @@
 	    }
 
 	    function update() {
-  			if (coralBleaching.ready) {
+  			if (solarInstalls.ready) {
           gl.clear(gl.COLOR_BUFFER_BIT);
           var mapProjection = map.getProjection();
           mapMatrix.set(pixelsToWebGLMatrix);
@@ -159,23 +159,23 @@
 
       function draw(transform) {
         pointSize = countryPointSizePixels * Math.pow(blockPointSizePixels / countryPointSizePixels, (map.zoom - 1) / (21 - 1));
-        gl.useProgram(coralBleaching.program);
-        gl.bindBuffer(gl.ARRAY_BUFFER, coralBleaching.arrayBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, coralBleaching.data, gl.STATIC_DRAW);
+        gl.useProgram(solarInstalls.program);
+        gl.bindBuffer(gl.ARRAY_BUFFER, solarInstalls.arrayBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, solarInstalls.data, gl.STATIC_DRAW);
 
-        var attributeLoc = gl.getAttribLocation(coralBleaching.program, 'worldCoord');
+        var attributeLoc = gl.getAttribLocation(solarInstalls.program, 'worldCoord');
         gl.enableVertexAttribArray(attributeLoc);
         gl.vertexAttribPointer(attributeLoc, 2, gl.FLOAT, false, 12, 0);
 
-        var sizeLoc = gl.getUniformLocation(coralBleaching.program, 'uSize');
+        var sizeLoc = gl.getUniformLocation(solarInstalls.program, 'uSize');
         gl.uniform1f(sizeLoc, pointSize);
 
-        var matrixLoc = gl.getUniformLocation(coralBleaching.program, 'mapMatrix');
+        var matrixLoc = gl.getUniformLocation(solarInstalls.program, 'mapMatrix');
         gl.uniformMatrix4fv(matrixLoc, false, transform);
 
-        gl.bindBuffer(gl.ARRAY_BUFFER, coralBleaching.arrayBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, coralBleaching.data, gl.STATIC_DRAW);
-        gl.drawArrays(gl.POINTS, 0, coralBleaching.pointCount);
+        gl.bindBuffer(gl.ARRAY_BUFFER, solarInstalls.arrayBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, solarInstalls.data, gl.STATIC_DRAW);
+        gl.drawArrays(gl.POINTS, 0, solarInstalls.pointCount);
 
       }
   	</script>
